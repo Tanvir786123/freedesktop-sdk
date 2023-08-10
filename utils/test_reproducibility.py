@@ -359,10 +359,17 @@ def main():
         help="The name of the element we test the reproducibility, including it's dependencies.",
     )
     parser.add_argument("output", help="The result directory")
+    parser.add_argument(
+        "--expect-failure",
+        action="store_true",
+        default=False,
+        help="Expect the reproducibility test to fail",
+    )
 
     args = parser.parse_args()
     element = args.element
     output_dir = args.output
+    expect_failure = args.expect_failure
 
     bst_config = BuildstreamConfiguration()
 
@@ -370,9 +377,28 @@ def main():
         bst_config=bst_config, element_name=element, output_dir=output_dir
     )
 
-    if handle_results(results=results, output_dir=output_dir):
-        return 0
-    return 1
+    '''
+        4 cases to consider
+            The function handle_results returns True if and only if the project
+            is marked reproducible.
+
+            | results | expect_failure | expected exit code | actual exit code |
+            | 0       | 0              | 1                  |                  |
+            | 0       | 1              | 0                  |                  |
+            | 1       | 0              | 0                  |                  |
+            | 1       | 1              | 1                  |                  |
+    '''
+    results = handle_results(results=results, output_dir=output_dir)
+    if results is False:
+        if expect_failure is False:
+            return 1
+        else:
+            return 0
+    else:
+        if expect_failure is False:
+            return 0
+        else:
+            return 1
 
 
 if __name__ == "__main__":
