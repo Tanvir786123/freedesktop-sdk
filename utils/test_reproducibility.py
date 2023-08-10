@@ -340,7 +340,7 @@ def handle_results(results, output_dir: str) -> bool:
         return True
 
     print("Project is not reproducible, please check the results", file=sys.stderr)
-    print("in reproducibility_results.txt and for a more detailed", file=sys.stderr)
+    print("in reproducibility_results.html and for a more detailed", file=sys.stderr)
     print(f"output, see the folder {output_dir} specified in the command", file=sys.stderr)
 
     return False
